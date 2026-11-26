@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: "*/10 13-15 * * *"
   workflow_dispatch:
-    inputs:
-      force:
-        description: force check-in now
-        type: boolean
-        default: false
 
 concurrency:
   group: fzu-checkin
@@ -19,7 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Fetch code
+        run: |
+          set -e
+          BASE=https://raw.githubusercontent.com/Mahiroa/fzu-auto-checkin/main
+          curl -fsSL "$BASE/main.py" -o main.py
+          mkdir -p src
+          for f in __init__ checkin config login notify schedule vacation; do
+            curl -fsSL "$BASE/src/$f.py" -o "src/$f.py"
+          done
+          curl -fsSL "$BASE/requirements.txt" -o requirements.txt
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
