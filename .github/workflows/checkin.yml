@@ -33,7 +33,8 @@ jobs:
         run: |
           echo "$CONFIG_B64" | base64 -d > config.yaml
           python -c "import yaml; d=yaml.safe_load(open('config.yaml',encoding='utf-8')); print('config ok', bool(d.get('user')), bool(d.get('checkin')))"
-      - name: Run check-in
+      - name: Run check-in now
         env:
+          CHECKIN_FORCE: "1"
           PYTHONIOENCODING: utf-8
         run: python main.py
