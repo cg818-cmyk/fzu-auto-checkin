@@ -1,8 +1,6 @@
 name: fzu-checkin
 
 on:
-  schedule:
-    - cron: "*/10 13-15 * * *"
   workflow_dispatch:
 
 concurrency:
