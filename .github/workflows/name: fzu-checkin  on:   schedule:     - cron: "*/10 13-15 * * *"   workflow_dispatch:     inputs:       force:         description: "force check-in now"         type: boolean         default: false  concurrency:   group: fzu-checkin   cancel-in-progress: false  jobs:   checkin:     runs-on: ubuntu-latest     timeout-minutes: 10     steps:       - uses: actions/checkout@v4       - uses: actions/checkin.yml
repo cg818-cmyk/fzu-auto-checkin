@@ -1,0 +1,37 @@
+name: fzu-checkin
+
+on:
+  schedule:
+    - cron: "*/10 13-15 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: force check-in now
+        type: boolean
+        default: false
+
+concurrency:
+  group: fzu-checkin
+  cancel-in-progress: false
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Prepare config
+        env:
+          CONFIG_B64: ${{ secrets.CONFIG_YAML_B64 }}
+        run: |
+          echo "$CONFIG_B64" | base64 -d > config.yaml
+          python -c "import yaml; d=yaml.safe_load(open('config.yaml',encoding='utf-8')); print('config ok', bool(d.get('user')), bool(d.get('checkin')))"
+      - name: Run check-in
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python main.py
